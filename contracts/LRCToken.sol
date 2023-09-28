@@ -23,7 +23,7 @@ contract LRCToken {
     );
     event Transfer(
         address indexed from,
-        address indexed  to,
+        address indexed to,
         uint tokens
     );
 
@@ -45,8 +45,6 @@ contract LRCToken {
     function balanceOf(address tokenOwner) public view returns(uint) {
         return balances[tokenOwner];
     }
-
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 
     // Transfer tokens to another account
     function transfer(address to, uint tokens) public returns(bool) {
@@ -76,23 +74,17 @@ contract LRCToken {
     function mint(address tokenOwner, uint256 amount) internal virtual {
         require(tokenOwner != address(0), "ERC20: mint to the zero address");
 
-        _beforeTokenTransfer(address(0), tokenOwner, amount);
-
         _totalSupply += amount;
         unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
             balances[tokenOwner] += amount;
         }
         emit Transfer(address(0), tokenOwner, amount);
-
-        _afterTokenTransfer(address(0), tokenOwner, amount);
     }
 
     // Burn token
     function burn(address tokenOwner, uint256 amount) internal virtual {
         require(tokenOwner != address(0), "ERC20: burn from the zero address");
-
-        _beforeTokenTransfer(tokenOwner, address(0), amount);
 
         uint256 accountBalance = balances[tokenOwner];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
@@ -103,8 +95,6 @@ contract LRCToken {
         }
 
         emit Transfer(tokenOwner, address(0), amount);
-
-        _afterTokenTransfer(tokenOwner, address(0), amount);
     }
 
     // Transfer from delegate
@@ -132,6 +122,8 @@ contract LRCToken {
 
         return true;
     }
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 
     function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 }
